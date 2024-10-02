@@ -6,6 +6,8 @@ Step 1: Log in to the OpenShift Cluster: Log in to your OpenShift cluster using 
 
 Step 2: Create deploymnet without PV and PVC 
 
+```oc create secret generic splunk-secret --from-literal=SPLUNK_PASSWORD='your_password'```
+
 ```
 apiVersion: apps/v1
 kind: Deployment
