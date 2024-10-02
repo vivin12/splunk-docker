@@ -1,8 +1,8 @@
 Step 1: Log in to the OpenShift Cluster: Log in to your OpenShift cluster using the oc CLI.
 
-oc login --token=<your-token> --server=<your-server>
+```oc login --token=<your-token> --server=<your-server>```
 
-oc new-project splunk
+```oc new-project splunk```
 
 Step 2: Create Persistent Volumes (PV) and Persistent Volume Claims (PVC)
 Define a Persistent Volume (PV) for Splunk storage: Splunk requires persistent storage to store indexed data. Create a persistent volume YAML file (adjust for your storage type, e.g., NFS, OCS, etc.).
@@ -22,7 +22,7 @@ spec:
     server: nfs-server-ip
 ```
 
-oc apply -f splunk-pv.yaml
+```oc apply -f splunk-pv.yaml```
 
 Create a Persistent Volume Claim (PVC) for Splunk: Define a PVC to claim storage from the persistent volume.
 
@@ -39,7 +39,7 @@ spec:
       storage: 100Gi
 ```
 
-oc apply -f splunk-pvc.yaml
+```oc apply -f splunk-pvc.yaml```
 
 Step 3: Deploy Splunk via Docker Image
 Create a Deployment for Splunk: Create a YAML file that defines the Splunk deployment using the Docker image:
@@ -83,18 +83,20 @@ spec:
           claimName: splunk-pvc
 ```
 
-oc apply -f splunk-deployment.yaml
+```oc apply -f splunk-deployment.yaml```
 
 Expose the Splunk Service: Expose the Splunk service so that it can be accessed from outside the OpenShift cluster.
 Expose Splunk via an OpenShift service and route:
 
+```
 oc expose deployment/splunk --port=8000 --target-port=8000 --name=splunk-web
 oc expose svc/splunk-web --hostname=splunk.example.com
+```
 
 This creates a route for the Splunk web interface.
-
 Check the Deployment Status: Verify that Splunk is running:
-oc get pods -n splunk
+
+```oc get pods -n splunk```
 
 Step 4: Access Splunk
 Access the Splunk Web Interface: Open your browser and go to the route URL you created:
@@ -106,8 +108,8 @@ Password: admin-password
 
 Step 5: Check Logs: Monitor Splunk’s logs for any issues:
 
-oc logs deployment/splunk
+```oc logs deployment/splunk```
 
 Scaling the Deployment: If you need to scale Splunk to handle more traffic, you can increase the number of replicas:
 
-oc scale deployment/splunk --replicas=3
+```oc scale deployment/splunk --replicas=3```
