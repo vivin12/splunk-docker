@@ -43,6 +43,45 @@ spec:
         fsGroup: 41812                  # Group that has write access
 ```
 
+```oc apply -f splunk-deployment.yaml```
+
+Step 3: Create a Service for Splunk
+
+```
+apiVersion: v1
+kind: Service
+metadata:
+  name: splunk-service
+spec:
+  selector:
+    app: splunk
+  ports:
+  - name: splunk-web
+    protocol: TCP
+    port: 8000
+    targetPort: 8000
+  - name: splunk-mgmt
+    protocol: TCP
+    port: 8089
+    targetPort: 8089
+  - name: splunk-fwd
+    protocol: TCP
+    port: 9997
+    targetPort: 9997
+  type: ClusterIP
+```
+
+```oc apply -f splunk-service.yaml```
+
+Step 4 : Expose a Route for the Splunk Web Interface 
+
+```oc expose svc splunk-service --port=8000 --name=splunk-route```
+
+```oc get route splunk-route```
+
+
+### For PV And PVC use the below example but it has not been tested yet 
+
 Step 2: Create Persistent Volumes (PV) and Persistent Volume Claims (PVC)
 Define a Persistent Volume (PV) for Splunk storage: Splunk requires persistent storage to store indexed data. Create a persistent volume YAML file (adjust for your storage type, e.g., NFS, OCS, etc.).
 
