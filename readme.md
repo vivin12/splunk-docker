@@ -4,6 +4,43 @@ Step 1: Log in to the OpenShift Cluster: Log in to your OpenShift cluster using 
 
 ```oc new-project splunk```
 
+Step 2: Create deploymnet without PV and PVC 
+
+```
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: splunk
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: splunk
+  template:
+    metadata:
+      labels:
+        app: splunk
+    spec:
+      containers:
+      - name: splunk
+        image: splunk/splunk:latest     # Use the latest or your specific version of Splunk
+        ports:
+        - containerPort: 8000           # Splunk Web Interface
+        - containerPort: 8089           # Splunk Management Port
+        - containerPort: 9997           # Splunk Forwarding Port
+        env:
+        - name: SPLUNK_START_ARGS
+          value: "--accept-license --answer-yes"
+        - name: SPLUNK_PASSWORD         # Retrieve the password from the secret
+          valueFrom:
+            secretKeyRef:
+              name: splunk-secret
+              key: SPLUNK_PASSWORD
+      securityContext:
+        runAsUser: 41812                # The Splunk user inside the container
+        fsGroup: 41812                  # Group that has write access
+```
+
 Step 2: Create Persistent Volumes (PV) and Persistent Volume Claims (PVC)
 Define a Persistent Volume (PV) for Splunk storage: Splunk requires persistent storage to store indexed data. Create a persistent volume YAML file (adjust for your storage type, e.g., NFS, OCS, etc.).
 
