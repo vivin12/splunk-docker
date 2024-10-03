@@ -13,6 +13,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: splunk
+  namespace: splunk-namespace
 spec:
   replicas: 1
   selector:
@@ -25,22 +26,20 @@ spec:
     spec:
       containers:
       - name: splunk
-        image: splunk/splunk:latest     # Use the latest or your specific version of Splunk
+        image: splunk/splunk:latest
         ports:
-        - containerPort: 8000           # Splunk Web Interface
-        - containerPort: 8089           # Splunk Management Port
-        - containerPort: 9997           # Splunk Forwarding Port
+        - containerPort: 8000
         env:
         - name: SPLUNK_START_ARGS
-          value: "--accept-license --answer-yes"
-        - name: SPLUNK_PASSWORD         # Retrieve the password from the secret
+          value: "--accept-license"
+        - name: SPLUNK_PASSWORD
           valueFrom:
             secretKeyRef:
               name: splunk-secret
               key: SPLUNK_PASSWORD
-      securityContext:
-        runAsUser: 41812                # The Splunk user inside the container
-        fsGroup: 41812                  # Group that has write access
+        securityContext:
+          runAsUser: 0  # Run as root (if necessary)
+          allowPrivilegeEscalation: true
 ```
 
 ```oc apply -f splunk-deployment.yaml```
